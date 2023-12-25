@@ -1,18 +1,29 @@
-const http = require('http');
-const httpProxy = require('http-proxy');
+const express = require('express');
+const app = express();
 
-const proxy = httpProxy.createProxyServer({});
-
-const proxyServer = http.createServer((req, res) => {
-  // Proxy the incoming request to the target server
-  proxy.web(req, res, {
-    target: 'http://apim.djezzy.dz', // Replace with the target server URL
-    changeOrigin: true
-  });
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
-const PORT = process.env.PORT || 8080;
+app.get('/ap4', async (req, res) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: "https://apim.djezzy.dz/oauth2/registration",
+      data: "msisdn=213793251117&client_id=6E6CwTkp8H1CyQxraPmcEJPQ7xka&scope=smsotp",
+      headers: { "content-type":"application/x-www-form-urlencoded" },
 
-proxyServer.listen(PORT, () => {
-  console.log(`Proxy server listening on port ${PORT}`);
+    });
+    res.json(response.data)
+  } catch (error) {
+    console.error(error.message);
+    res.json(error)
+  }
+});
+
+
+
+
+app.listen(3000, () => {
+  console.log('Example app listening on port 3000!');
 });
